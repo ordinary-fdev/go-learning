@@ -1,0 +1,5 @@
+Server: "PRATEEK-LAPTOP\\SQLEXPRESS"
+User: sa
+Pwd: pwd
+Port: 1443
+Db: test
