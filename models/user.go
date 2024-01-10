@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	database "github.com/ordinary-fdev/go-learning/db"
+	database "github.com/ordinary-fdev/go-learning/database"
 	"github.com/ordinary-fdev/go-learning/services"
 )
 

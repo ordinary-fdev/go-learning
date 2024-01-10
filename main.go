@@ -2,7 +2,7 @@ package main
 
 import (
 	_ "github.com/denisenkom/go-mssqldb"
-	database "github.com/ordinary-fdev/go-learning/db"
+	database "github.com/ordinary-fdev/go-learning/database"
 	"github.com/ordinary-fdev/go-learning/router"
 )
 
