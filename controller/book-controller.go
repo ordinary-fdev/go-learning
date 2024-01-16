@@ -77,3 +77,17 @@ func DeleteBook(ctx *gin.Context) {
 		"bookID": id,
 	})
 }
+
+func AssignBookToUser(ctx *gin.Context) {
+	book := models.NewBookController()
+	assignedID, err := book.AssignBookToUser(ctx)
+
+	if err != nil {
+		ctx.JSON(404, gin.H{
+			"error": err,
+		})
+	}
+	ctx.JSON(200, gin.H{
+		"bookID": assignedID,
+	})
+}

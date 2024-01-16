@@ -19,9 +19,11 @@ func InitializeRoutes() {
 	protectedGrp.GET("/getBookById/:id", controller.GetBookById)
 	protectedGrp.POST("/updateBook/:id", controller.UpdateBook)
 	protectedGrp.POST("/deleteBook/:id", controller.DeleteBook)
+	protectedGrp.POST("/assingBook", controller.AssignBookToUser)
+	protectedGrp.POST("/userBooks", controller.GetUserBooks)
 
 	r.POST("/login", controller.Login)
 	r.POST("/register", controller.Register)
-
+	r.POST("/refreshToken", controller.RefreshToken)
 	http.ListenAndServe(":8080", r)
 }

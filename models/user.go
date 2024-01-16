@@ -12,11 +12,13 @@ type User struct {
 	UserName string
 	Password string
 	Token    string
+	Books    []int
 }
 
 type IUser interface {
 	Register()
 	Login()
+	RefreshToken()
 }
 
 func NewUserController() *User {
@@ -77,9 +79,51 @@ func (user *User) Login(ctx *gin.Context) (interface{}, error) {
 			if err != nil {
 				return "", fmt.Errorf("error in token generation")
 			}
-			ctx.SetCookie("user", tokenstring, 3600, "/", "localhost", false, true)
+			// ctx.SetCookie("user", tokenstring, 3600, "/", "localhost", false, true)
 			return tokenstring, nil
 		}
 	}
 	return "", nil
+}
+
+func (user *User) RefreshToken(ctx *gin.Context) interface{} {
+	err := ctx.BindJSON(&user)
+	if err != nil {
+		return fmt.Errorf("error in parsing body")
+	}
+	tokenstring, _ := services.ValidateRefreshToken(ctx, user.Token)
+	return tokenstring
+}
+
+func (user *User) GetUserBooks(ctx *gin.Context) (interface{}, error) {
+	db := database.GetDb()
+
+	// queryForBooksID := fmt.Sprintf("SELECT Assignments.bookid from Assignments where userid = '%s'", user.UserName)
+
+	username, err := services.ExtractUserNameFromToken(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	query := fmt.Sprintf("SELECT Books.Book_id, Books.title FROM Assignments INNER JOIN users ON users.username = Assignments.userid INNER JOIN Books on Assignments.bookid = Books.Book_id  WHERE Assignments.userid = '%s'", username)
+
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("error in parsing body")
+	}
+
+	defer rows.Close()
+	var assignedBooks []AssignBookBody
+	aBook := AssignBookBody{}
+	for rows.Next() {
+		err := rows.Scan(&aBook.BookID, &aBook.UserID)
+		if err != nil {
+			fmt.Println("Error reading rows: " + err.Error())
+			return nil, err
+		}
+		assignedBooks = append(assignedBooks, aBook)
+	}
+	return assignedBooks, nil
+
 }

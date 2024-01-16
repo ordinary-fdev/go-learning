@@ -15,12 +15,18 @@ type Book struct {
 	Quantity int
 }
 
+type AssignBookBody struct {
+	BookID string `json:"bookid"`
+	UserID string `json:"userid"`
+}
+
 type IBook interface {
 	GetAllBooks()
 	CreateBook()
 	GetBookById()
 	DeleteBook()
 	UpdateBook()
+	AssignBookToUser()
 }
 
 func NewBookController() *Book {
@@ -198,4 +204,36 @@ func (book *Book) DeleteBook(ctx *gin.Context) (int, error) {
 
 	defer rows.Close()
 	return bookID, err
+}
+
+func (book *Book) AssignBookToUser(ctx *gin.Context) (int, error) {
+	assignBookBody := AssignBookBody{}
+	err := ctx.BindJSON(&assignBookBody)
+
+	if err != nil {
+		fmt.Println("con not parse body")
+	}
+
+	if assignBookBody.BookID == "" || assignBookBody.UserID == "" {
+		fmt.Println("con not parse body")
+		return -1, fmt.Errorf("missing ids")
+	}
+
+	db := database.GetDb()
+
+	query := fmt.Sprintf("INSERT INTO Assignments (bookid, userid) VALUES ('%s' ,'%s');select ID = convert(bigint, SCOPE_IDENTITY())", assignBookBody.BookID, assignBookBody.UserID)
+
+	rows, err := db.Query(query)
+
+	if err != nil {
+		fmt.Println("Can not bind json")
+		return -1, err
+	}
+
+	var lastInsertId1 int
+	for rows.Next() {
+		rows.Scan(&lastInsertId1)
+	}
+	defer rows.Close()
+	return lastInsertId1, nil
 }
